@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Messages</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    h1 { text-align: center; color: #a8326e; margin-top: 30px; }
+    .container { max-width: 700px; margin: 30px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(255, 105, 180, 0.1); padding: 30px; }
+    .message { border-bottom: 1px solid #eee; padding: 15px 0; }
+    .message:last-child { border-bottom: none; }
+    .message strong { color: #a8326e; }
+    .date { color: #888; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <script>
+    if (localStorage.getItem('loggedIn') !== 'true' || localStorage.getItem('isAdmin') !== 'true') {
+      window.location.href = 'auth.html';
+    }
+  </script>
+  <h1>Submitted Messages</h1>
+  <div class="container" id="messages-container">
+    Loading messages...
+  </div>
+  <script>
+    fetch('http://localhost:3000/messages')
+      .then(res => res.json())
+      .then(messages => {
+        const container = document.getElementById('messages-container');
+        if (!messages.length) {
+          container.textContent = 'No messages yet.';
+          return;
+        }
+        container.innerHTML = '';
+        messages.reverse().forEach(msg => {
+          const div = document.createElement('div');
+          div.className = 'message';
+          div.innerHTML = `<strong>${msg.name}</strong> (<span class="date">${new Date(msg.date).toLocaleString()}</span>)<br>Email: ${msg.email}<br>Message: ${msg.message}`;
+          container.appendChild(div);
+        });
+      })
+      .catch(() => {
+        document.getElementById('messages-container').textContent = 'Failed to load messages.';
+      });
+  </script>
+</body>
+</html>
